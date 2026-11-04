@@ -1,0 +1,939 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9ff6c68db0664440a55092863fc57de, type: 3}
+  m_Name: DemoBeatmap
+  m_EditorClassIdentifier: Assembly-CSharp::ArcaneSaber.BeatmapController
+  Music: {fileID: 0}
+  BPM: 112
+  MusicOffset: 0
+  Notes:
+  - Timestamp: 4.285714
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 4.8214283
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 5.3571424
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 5.892857
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 6.428571
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 6.9642854
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 7.5
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 8.035714
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 8.571428
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 9.107142
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 9.642857
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 10.178571
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 10.714285
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 11.25
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 11.785714
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 12.321428
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 12.857142
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 13.392857
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 13.928571
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 14.464285
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 15
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 15.535714
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 16.071428
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 16.607141
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 17.142857
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 17.678572
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 18.214285
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 18.75
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 19.285713
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 19.821428
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 20.357141
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 20.892857
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 21.42857
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 21.964285
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 22.5
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 23.035713
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 23.571428
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 24.107141
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 24.642857
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 25.17857
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 25.714285
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 26.25
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 26.785713
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 27.321428
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 27.857141
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 28.392857
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 28.92857
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 29.464285
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 30
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 30.535713
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 31.071428
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 31.607141
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 32.142857
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 32.67857
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 33.214283
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 33.75
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 34.285713
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 34.821426
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 35.357143
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 35.892857
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 36.42857
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 36.964283
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 37.5
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 38.035713
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 38.571426
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 39.107143
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 39.642857
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 40.17857
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 40.714283
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 41.25
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 41.785713
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 42.321426
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 42.85714
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 43.392857
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 43.92857
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 44.464283
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 45
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 45.535713
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 46.071426
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 46.60714
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 47.142857
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 47.67857
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 48.214283
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 48.75
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 49.285713
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 49.821426
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 50.35714
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 50.892857
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 51.42857
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 51.964283
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 52.5
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 53.035713
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 53.571426
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 54.10714
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 54.642857
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 55.17857
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 55.714283
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 56.25
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 56.785713
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 57.321426
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 57.85714
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 58.392857
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 58.92857
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 59.464283
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 60
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 60.535713
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 61.071426
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 61.60714
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 62.142857
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 62.67857
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 63.214283
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 63.749996
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 64.28571
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 64.82143
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 65.35714
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 65.89285
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 66.428566
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 66.96429
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 67.5
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 68.03571
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 68.57143
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 69.10714
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 69.64285
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 70.178566
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 70.71429
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 71.25
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 71.78571
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 72.32143
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 72.85714
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 73.39285
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 73.928566
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 74.46429
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 75
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 75.53571
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 76.07143
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 76.60714
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 77.14285
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 77.678566
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 78.21429
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 78.75
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 79.28571
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 79.82143
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 80.35714
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 80.89285
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 81.428566
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 81.96429
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 82.5
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 83.03571
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 83.57143
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 84.10714
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 84.64285
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 85.178566
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 85.71428
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 86.25
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 86.78571
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 87.32143
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 87.85714
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 88.39285
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 88.928566
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 89.46428
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 90
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 90.53571
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 91.07143
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 91.60714
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 92.14285
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 92.678566
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 93.21428
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 93.75
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 94.28571
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 94.82143
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 95.35714
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 95.89285
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 96.428566
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 96.96428
+    Lane: 0
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 97.5
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 98.03571
+    Lane: 1
+    Direction: 8
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 98.57143
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 99.10714
+    Lane: 0
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 99.64285
+    Lane: 1
+    Direction: 3
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 100.178566
+    Lane: 1
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 100.71428
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 101.25
+    Lane: 0
+    Direction: 2
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 101.78571
+    Lane: 1
+    Direction: 1
+    TravelSpeed: 9
+    HitWindow: 0.16
+  - Timestamp: 102.32143
+    Lane: 1
+    Direction: 0
+    TravelSpeed: 9
+    HitWindow: 0.16
+

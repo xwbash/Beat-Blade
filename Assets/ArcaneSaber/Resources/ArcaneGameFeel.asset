@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0851504db5de1934e9fa3eb4591441d6, type: 3}
+  m_Name: ArcaneGameFeel
+  m_EditorClassIdentifier: Assembly-CSharp::ArcaneSaber.GameFeelSettings
+  SaberAssist: 0.8
+  MagicTimingAssist: 0.75
+  MagicHandPositionStiffness: 560
+  MagicHandPositionDamping: 0.68
+  MagicHandRotationStiffness: 420
+  MagicHandRotationDamping: 0.72
+  MagicGestureArcIntensity: 0.24
+  MagicGestureDistance: 0.4
+  MagicGestureOvershoot: 0.35
+  MagicFingerCurlIntensity: 1
+  MagicFingerReleaseSpeed: 18
+  MagicTrailIntensity: 1
+  MagicIdleSway: 0.018
+  MagicRecoverySpeed: 3
+  SaberPositionStiffness: 1050
+  SaberPositionDamping: 0.74
+  SaberRotationStiffness: 640
+  SaberRotationDamping: 0.62
+  SaberBladeLag: 0.9
+  SaberWristInfluence: 1
+  SaberOvershoot: 0.3
+  SaberSwingSensitivity: 1
+  SaberTrailIntensity: 1
+  MagicCameraInfluence: 0.6
+  SaberCameraInfluence: 0.4
+  CameraPositionStiffness: 140
+  CameraPositionDamping: 0.85
+  CameraRotationStiffness: 120
+  CameraRotationDamping: 0.9
+  CameraImpactIntensity: 1
+  MaximumCameraRoll: 3
+  IdleCameraInfluence: 0.5
+  MusicCameraInfluence: 1
+  ReducedMotion: 0
