@@ -18,7 +18,7 @@ namespace ArcaneSaber
             new[]{new Color(1,.1f,.03f),new Color(1,.5f,.05f)},
             new[]{new Color(1,1,1),new Color(.6f,.8f,1)},
         };
-        public static readonly string[] PaletteNames={"Kızıl / Camgöbeği","Mor / Altın","Yeşil / Pembe","Mavi / Buz","Kırmızı / Turuncu","Beyaz"};
+        public static readonly string[] PaletteNames={"Crimson / Cyan","Purple / Gold","Green / Pink","Blue / Ice","Red / Orange","White"};
         const int BeamCount=12,RingCount=16,StreakCount=90,WaveCount=6;
         class Beam { public Transform Shaft,Flare; public Material ShaftMaterial,FlareMaterial; public Light Spot; public Vector3 Origin,Direction; public int Side; }
         class Wave { public LineRenderer Line; public Material Material; public float Z=-1; }

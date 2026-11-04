@@ -14,7 +14,7 @@ namespace ArcaneSaber
     [Serializable] public class StageEvent
     {
         public float Time; public int Kind; public float Value=1; public float Duration=.5f;
-        public static readonly string[] Names={"Flaş","Strobe","Karartma","Spot: Tarama","Spot: Kameraya","Spot: Yelpaze","Renk Paleti","Halka Dönüşü","Kamera Darbe","Kamera Zoom","Kamera Yatış","Işık Seviyesi"};
+        public static readonly string[] Names={"Flash","Strobe","Blackout","Spot: Sweep","Spot: At Camera","Spot: Fan","Color Palette","Ring Spin","Camera Punch","Camera Zoom","Camera Roll","Light Level"};
     }
 
     [Serializable] public class ModMap
@@ -44,7 +44,7 @@ namespace ArcaneSaber
             BPM=Finite(BPM)?Mathf.Clamp(BPM,30,300):120; BeatOffset=Finite(BeatOffset)?BeatOffset:0;
             NoteSpeed=Finite(NoteSpeed)?Mathf.Clamp(NoteSpeed,4,30):11; HitWindow=Finite(HitWindow)?Mathf.Clamp(HitWindow,.05f,.4f):.16f;
             LightPower=Finite(LightPower)?Mathf.Clamp(LightPower,0,2):1; CameraPower=Finite(CameraPower)?Mathf.Clamp(CameraPower,0,2):1; BloomPower=Finite(BloomPower)?Mathf.Clamp(BloomPower,0,2):1;
-            Title=string.IsNullOrEmpty(Title)?"Adsız Mod":Title; Sort();
+            Title=string.IsNullOrEmpty(Title)?"Untitled Mod":Title; Sort();
         }
         static bool Finite(float value) => !float.IsNaN(value) && !float.IsInfinity(value);
         // The mouse laser only cuts left, right, or free: diagonals keep their side, up/down become free.
@@ -83,7 +83,7 @@ namespace ArcaneSaber
             {
                 string file=Path.Combine(folder,"map.json"); if(!File.Exists(file)) continue;
                 try { var mod=JsonUtility.FromJson<ModMap>(File.ReadAllText(file)); mod.Id=Path.GetFileName(folder); mod.Sanitize(); mods.Add(mod); }
-                catch(Exception e) { Debug.LogWarning("Mod okunamadı: "+folder+" / "+e.Message); }
+                catch(Exception e) { Debug.LogWarning("Could not read mod: "+folder+" / "+e.Message); }
             }
             mods.Sort((a,b)=>string.Compare(a.Title,b.Title,StringComparison.CurrentCultureIgnoreCase));
             return mods;
@@ -91,7 +91,7 @@ namespace ArcaneSaber
         public static ModMap Create(string audioPath)
         {
             string extension=Path.GetExtension(audioPath);
-            if(!Supported(extension)) throw new InvalidOperationException("Desteklenen ses türleri: mp3, wav, ogg.");
+            if(!Supported(extension)) throw new InvalidOperationException("Supported audio formats: mp3, wav, ogg.");
             var mod=new ModMap{Id=Guid.NewGuid().ToString("N"),Title=Path.GetFileNameWithoutExtension(audioPath),AudioFile="audio"+extension.ToLowerInvariant()};
             Directory.CreateDirectory(Folder(mod)); File.Copy(audioPath,AudioPath(mod),true); Save(mod); return mod;
         }
@@ -128,11 +128,11 @@ namespace ArcaneSaber
                     if(entry.FullName=="map.json") json=entry;
                     else if(entry.FullName==Path.GetFileName(entry.FullName) && Supported(Path.GetExtension(entry.FullName))) audio=entry;
                 }
-                if(json==null || audio==null) throw new InvalidOperationException("Dosya geçerli bir Arcane Saber modu değil.");
-                if(json.Length>MaximumMapBytes || audio.Length>MaximumAudioBytes) throw new InvalidOperationException("Mod dosyası çok büyük.");
+                if(json==null || audio==null) throw new InvalidOperationException("The file is not a valid Arcane Saber mod.");
+                if(json.Length>MaximumMapBytes || audio.Length>MaximumAudioBytes) throw new InvalidOperationException("Mod file is too large.");
                 ModMap mod;
                 using(var reader=new StreamReader(json.Open())) mod=JsonUtility.FromJson<ModMap>(reader.ReadToEnd());
-                if(mod==null) throw new InvalidOperationException("map.json okunamadı.");
+                if(mod==null) throw new InvalidOperationException("Could not read map.json.");
                 Install(mod,audio,Path.GetExtension(audio.FullName));
                 return new List<ModMap>{mod};
             }
@@ -140,7 +140,7 @@ namespace ArcaneSaber
         // Gives the mod a fresh folder, copies its audio out of the archive, and saves it.
         internal static void Install(ModMap mod,ZipArchiveEntry audio,string extension)
         {
-            if(audio.Length>MaximumAudioBytes) throw new InvalidOperationException("Ses dosyası çok büyük.");
+            if(audio.Length>MaximumAudioBytes) throw new InvalidOperationException("Audio file is too large.");
             mod.Id=Guid.NewGuid().ToString("N"); mod.AudioFile="audio"+extension.ToLowerInvariant(); mod.Sanitize();
             Directory.CreateDirectory(Folder(mod));
             try
@@ -173,7 +173,7 @@ namespace ArcaneSaber
                 if(request.result!=UnityWebRequest.Result.Success) { done(null,request.error); yield break; }
                 var clip=DownloadHandlerAudioClip.GetContent(request);
                 while(clip && clip.loadState==AudioDataLoadState.Loading) yield return null;
-                if(!clip || clip.loadState!=AudioDataLoadState.Loaded || clip.samples==0) done(null,"Ses çözülemedi: "+Path.GetFileName(path));
+                if(!clip || clip.loadState!=AudioDataLoadState.Loaded || clip.samples==0) done(null,"Could not decode audio: "+Path.GetFileName(path));
                 else done(clip,null);
             }
         }
@@ -197,7 +197,7 @@ namespace ArcaneSaber
             var mono=new float[length]; var chunk=new float[rate*channels];
             for(int start=0;start<length;start+=rate)
             {
-                if(!clip.GetData(chunk,start)) throw new InvalidOperationException("Ses verisi okunamadı (sıkıştırılmış klip).");
+                if(!clip.GetData(chunk,start)) throw new InvalidOperationException("Could not read audio data (compressed clip).");
                 int frames=Mathf.Min(rate,length-start);
                 for(int i=0;i<frames;i++) { float x=0; for(int c=0;c<channels;c++) x+=chunk[i*channels+c]; mono[start+i]=x/channels; }
             }

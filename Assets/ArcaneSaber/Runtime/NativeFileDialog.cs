@@ -6,9 +6,9 @@ namespace ArcaneSaber
     // Unity has no runtime file picker; this is the plain Win32 dialog, in editor and player.
     public static class NativeFileDialog
     {
-        public const string AudioFilter="Ses dosyası (mp3, wav, ogg)\0*.mp3;*.wav;*.ogg\0\0";
-        public const string MapFilter="Arcane Saber modu (.arcanemap)\0*.arcanemap\0\0";
-        public const string ImportFilter="Arcane Saber modu veya BeatSaver haritası (.arcanemap, .zip)\0*.arcanemap;*.zip\0\0";
+        public const string AudioFilter="Audio file (mp3, wav, ogg)\0*.mp3;*.wav;*.ogg\0\0";
+        public const string MapFilter="Arcane Saber mod (.arcanemap)\0*.arcanemap\0\0";
+        public const string ImportFilter="Arcane Saber mod or BeatSaver map (.arcanemap, .zip)\0*.arcanemap;*.zip\0\0";
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
         public static bool Supported => true;
         [StructLayout(LayoutKind.Sequential,CharSet=CharSet.Unicode)]

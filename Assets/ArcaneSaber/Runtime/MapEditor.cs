@@ -18,7 +18,7 @@ namespace ArcaneSaber
         readonly List<RhythmNote> selected=new List<RhythmNote>(); StageEvent selectedEvent;
         readonly List<string> undo=new List<string>(),redo=new List<string>();
         readonly float[] speeds={1,.75f,.5f}; readonly string[] speedNames={"1x",".75x",".5x"};
-        readonly string[] snapNames={"Serbest","1/1","1/2","1/4"}; readonly int[] snapDivisions={0,1,2,4};
+        readonly string[] snapNames={"Free","1/1","1/2","1/4"}; readonly int[] snapDivisions={0,1,2,4};
         AudioClip clip; SongAnalysis song; BeatmapController preview; Texture2D wave; Color32[] wavePixels;
         bool playing,mapDirty,seekDirty,ticks=true; double scheduledUntil; double snippetEnd=-1,snippetHome; int speedIndex,snapIndex; float density=.5f;
         double viewStart,viewSpan=12,drawnStart=-1,drawnSpan; string bpmText=""; int handKey; Vector2 leftScroll,rightScroll;
@@ -33,7 +33,7 @@ namespace ArcaneSaber
             bpmText=mod.BPM.ToString("0.##"); viewStart=0; viewSpan=Mathf.Min(12,clip.length); drawnStart=-1; Head=0; playing=false;
             if(!preview) preview=ScriptableObject.CreateInstance<BeatmapController>();
             mod.ToBeatmap(clip,preview); music.Prepare(preview,clip); mapDirty=true;
-            Status=$"{clip.length/60:0}:{clip.length%60:00} ses yüklendi. BOŞLUK çal, K ile vuruşları işaretle.";
+            Status=$"{clip.length/60:0}:{clip.length%60:00} audio loaded. SPACE to play, K to mark beats.";
         }
         // Back from a section test: the arena, music and playhead return to where editing stopped.
         public void Resume(double time)
@@ -181,9 +181,9 @@ namespace ArcaneSaber
             }
             next=next??first;
             selected.Clear(); selectedEvent=null;
-            if(next==null) { Status="Karar bekleyen işaret kalmadı."; return; }
+            if(next==null) { Status="No undecided marks left."; return; }
             selected.Add(next); PlaySnippet(next.Timestamp);
-            Status=$"{Mod.UndecidedCount} işaret kaldı: J = sol el, L = sağ lazer.";
+            Status=$"{Mod.UndecidedCount} marks left: J = left hand, L = right laser.";
         }
         void SetDirection(int direction)
         {
@@ -250,29 +250,29 @@ namespace ArcaneSaber
             var ui=game; Rebuild();
             ui.Panel(new Rect(0,0,1440,86),new Color(.006f,.01f,.022f,.9f));
             ui.Label(30,12,620,34,Mod.Title,ui.Body);
-            ui.Label(30,46,800,24,$"{Clock(Head)}  /  {Clock(clip.length)}     {Mod.Notes.Count} not     {Mod.UndecidedCount} kararsız     {Mod.Events.Count} sahne     {Status}",ui.Small);
-            if(GUI.Button(new Rect(860,16,120,50),playing?"DURDUR":"ÇAL",ui.ButtonStyle)) { if(playing) Pause(); else Play(); }
+            ui.Label(30,46,800,24,$"{Clock(Head)}  /  {Clock(clip.length)}     {Mod.Notes.Count} notes     {Mod.UndecidedCount} undecided     {Mod.Events.Count} stage     {Status}",ui.Small);
+            if(GUI.Button(new Rect(860,16,120,50),playing?"STOP":"PLAY",ui.ButtonStyle)) { if(playing) Pause(); else Play(); }
             speedIndex=GUI.SelectionGrid(new Rect(990,16,120,24),speedIndex,speedNames,3);
-            if(GUI.Button(new Rect(990,42,120,24),"Geri Al")) Restore(undo,redo);
-            if(GUI.Button(new Rect(1120,16,110,50),"KAYDET",ui.ButtonStyle)) Save();
+            if(GUI.Button(new Rect(990,42,120,24),"Undo")) Restore(undo,redo);
+            if(GUI.Button(new Rect(1120,16,110,50),"SAVE",ui.ButtonStyle)) Save();
             if(GUI.Button(new Rect(1236,16,86,50),"TEST (T)",ui.ButtonStyle)) { Pause(); Save(); Test?.Invoke(Head); }
-            if(GUI.Button(new Rect(1328,16,88,50),"ÇIKIŞ",ui.ButtonStyle)) Exit?.Invoke();
+            if(GUI.Button(new Rect(1328,16,88,50),"EXIT",ui.ButtonStyle)) Exit?.Invoke();
             ToolPanel(); Inspector(); Timeline();
             ui.Panel(new Rect(0,846,1440,54),new Color(.006f,.01f,.022f,.9f));
-            ui.Label(30,850,1380,20,"BOŞLUK çal/durdur     K işaret     J sol el     L sağ lazer     TAB sıradaki kararsız     W A S D yön     F serbest kesim     SİL sil     1-0 - = sahne     , . ince ayar",ui.Subtitle);
-            ui.Label(30,872,1380,20,"T buradan test et     Sol tık seç/sürükle     Boş alanda sürükle: çoklu seçim     Sağ tık sil     Teker: zoom     Ctrl+Teker: kaydır     Ctrl+Z / Y     Ctrl+S",ui.Subtitle);
+            ui.Label(30,850,1380,20,"SPACE play/stop     K mark     J left hand     L right laser     TAB next undecided     W A S D direction     F free cut     DEL delete     1-0 - = stage     , . fine nudge",ui.Subtitle);
+            ui.Label(30,872,1380,20,"T test from here     Left click select/drag     Drag on empty space: multi-select     Right click delete     Wheel: zoom     Ctrl+Wheel: scroll     Ctrl+Z / Y     Ctrl+S",ui.Subtitle);
         }
         void Rule(string text,bool first=false) { if(!first) GUILayout.Space(10); GUILayout.Label(text,game.Accent); }
         void ToolPanel()
         {
             game.Panel(new Rect(16,94,272,462),new Color(.006f,.01f,.022f,.86f));
             GUILayout.BeginArea(new Rect(24,100,256,450)); leftScroll=GUILayout.BeginScrollView(leftScroll);
-            Rule("OTOMATİK",true);
-            GUILayout.BeginHorizontal(); GUILayout.Label("Yoğunluk",GUILayout.Width(66)); density=GUILayout.HorizontalSlider(density,0,1); GUILayout.EndHorizontal();
-            if(GUILayout.Button("Vuruşları işaretle")) { Snapshot(); int added=MapAutomation.Mark(Mod,song,density,snapDivisions[snapIndex]); mapDirty=true; Status=$"{added} işaret eklendi."; }
-            if(GUILayout.Button("Sağ / sol otomatik karar")) { Snapshot(); int n=MapAutomation.Assign(Mod); mapDirty=true; Status=$"{n} işarete karar verildi."; }
-            if(GUILayout.Button("Işık + kamera üret")) { Snapshot(); MapAutomation.Stage(Mod,song); mapDirty=true; Status=$"{Mod.Events.Count} sahne olayı üretildi."; }
-            Rule("SAHNE OLAYI EKLE");
+            Rule("AUTOMATIC",true);
+            GUILayout.BeginHorizontal(); GUILayout.Label("Density",GUILayout.Width(66)); density=GUILayout.HorizontalSlider(density,0,1); GUILayout.EndHorizontal();
+            if(GUILayout.Button("Mark beats")) { Snapshot(); int added=MapAutomation.Mark(Mod,song,density,snapDivisions[snapIndex]); mapDirty=true; Status=$"{added} marks added."; }
+            if(GUILayout.Button("Auto-assign right / left")) { Snapshot(); int n=MapAutomation.Assign(Mod); mapDirty=true; Status=$"{n} marks assigned."; }
+            if(GUILayout.Button("Generate lights + camera")) { Snapshot(); MapAutomation.Stage(Mod,song); mapDirty=true; Status=$"{Mod.Events.Count} stage events generated."; }
+            Rule("ADD STAGE EVENT");
             string[] keys={"1","2","3","4","5","6","7","8","9","0","-","="};
             for(int i=0;i<StageEvent.Names.Length;i++)
                 if(GUILayout.Button($"{keys[i]}   {StageEvent.Names[i]}",game.LeftButton)) AddEvent((StageKind)i);
@@ -289,19 +289,19 @@ namespace ArcaneSaber
         {
             game.Panel(new Rect(1152,94,272,462),new Color(.006f,.01f,.022f,.86f));
             GUILayout.BeginArea(new Rect(1160,100,256,450)); rightScroll=GUILayout.BeginScrollView(rightScroll);
-            Rule("SEÇİM",true);
+            Rule("SELECTION",true);
             if(selected.Count>0)
             {
-                GUILayout.Label(selected.Count==1?$"Not  {Clock(selected[0].Timestamp)}":$"{selected.Count} not seçili");
+                GUILayout.Label(selected.Count==1?$"Note  {Clock(selected[0].Timestamp)}":$"{selected.Count} notes selected");
                 GUILayout.BeginHorizontal();
-                if(GUILayout.Button("SOL EL (J)")) LaneButton(0);
-                if(GUILayout.Button("SAĞ LAZER (L)")) LaneButton(1);
+                if(GUILayout.Button("LEFT HAND (J)")) LaneButton(0);
+                if(GUILayout.Button("RIGHT LASER (L)")) LaneButton(1);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
-                string[] names={"Yukarı","Sol","Aşağı","Sağ"};
+                string[] names={"Up","Left","Down","Right"};
                 for(int d=0;d<4;d++) if(GUILayout.Button(names[d])) SetDirection(d);
                 GUILayout.EndHorizontal();
-                if(GUILayout.Button("Seçimi sil")) DeleteSelection();
+                if(GUILayout.Button("Delete selection")) DeleteSelection();
             }
             else if(selectedEvent!=null)
             {
@@ -315,29 +315,29 @@ namespace ArcaneSaber
                 }
                 else
                 {
-                    Slider("Güç",ref selectedEvent.Value,kind==StageKind.CameraRoll?-1:0,1);
-                    if(kind==StageKind.Strobe || kind==StageKind.Blackout) Slider("Süre (sn)",ref selectedEvent.Duration,.05f,8);
+                    Slider("Power",ref selectedEvent.Value,kind==StageKind.CameraRoll?-1:0,1);
+                    if(kind==StageKind.Strobe || kind==StageKind.Blackout) Slider("Duration (s)",ref selectedEvent.Duration,.05f,8);
                 }
-                if(GUILayout.Button("Olayı sil")) DeleteSelection();
+                if(GUILayout.Button("Delete event")) DeleteSelection();
             }
-            else GUILayout.Label("Zaman çizelgesinden not veya sahne olayı seç.");
+            else GUILayout.Label("Select a note or stage event on the timeline.");
             Rule("TEMPO");
             GUILayout.BeginHorizontal(); GUILayout.Label("BPM",GUILayout.Width(40));
             string text=GUILayout.TextField(bpmText,GUILayout.Width(70));
             if(text!=bpmText) { bpmText=text; if(float.TryParse(text,System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out float bpm) && bpm>=30 && bpm<=300) { Mod.BPM=bpm; mapDirty=true; } }
-            if(GUILayout.Button("Algıla")) { Mod.BPM=song.BPM; Mod.BeatOffset=song.Phase; bpmText=song.BPM.ToString("0.##"); GUIUtility.keyboardControl=0; mapDirty=true; Status=$"Tempo {song.BPM:0.##} BPM."; }
+            if(GUILayout.Button("Detect")) { Mod.BPM=song.BPM; Mod.BeatOffset=song.Phase; bpmText=song.BPM.ToString("0.##"); GUIUtility.keyboardControl=0; mapDirty=true; Status=$"Tempo {song.BPM:0.##} BPM."; }
             GUILayout.EndHorizontal();
-            Slider("Vuruş kayması",ref Mod.BeatOffset,0,60f/Mod.BPM);
-            ticks=GUILayout.Toggle(ticks," Notlarda vuruş sesi");
-            GUILayout.Label("Izgaraya oturt");
+            Slider("Beat offset",ref Mod.BeatOffset,0,60f/Mod.BPM);
+            ticks=GUILayout.Toggle(ticks," Tick sound on notes");
+            GUILayout.Label("Snap to grid");
             snapIndex=GUILayout.SelectionGrid(snapIndex,snapNames,4);
             Rule("MOD");
-            GUILayout.BeginHorizontal(); GUILayout.Label("Ad",GUILayout.Width(40)); Mod.Title=GUILayout.TextField(Mod.Title); GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal(); GUILayout.Label("Sanatçı",GUILayout.Width(50)); Mod.Artist=GUILayout.TextField(Mod.Artist); GUILayout.EndHorizontal();
-            Slider("Not hızı",ref Mod.NoteSpeed,5,24);
-            Slider("Vuruş penceresi",ref Mod.HitWindow,.08f,.3f);
-            Slider("Işık gücü",ref Mod.LightPower,0,2);
-            Slider("Kamera gücü",ref Mod.CameraPower,0,2);
+            GUILayout.BeginHorizontal(); GUILayout.Label("Title",GUILayout.Width(40)); Mod.Title=GUILayout.TextField(Mod.Title); GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal(); GUILayout.Label("Artist",GUILayout.Width(50)); Mod.Artist=GUILayout.TextField(Mod.Artist); GUILayout.EndHorizontal();
+            Slider("Note speed",ref Mod.NoteSpeed,5,24);
+            Slider("Hit window",ref Mod.HitWindow,.08f,.3f);
+            Slider("Light power",ref Mod.LightPower,0,2);
+            Slider("Camera power",ref Mod.CameraPower,0,2);
             Slider("Bloom",ref Mod.BloomPower,0,2);
             GUILayout.EndScrollView(); GUILayout.EndArea();
         }
@@ -353,8 +353,8 @@ namespace ArcaneSaber
             GUI.DrawTexture(new Rect(Left,WaveY,Width,WaveHeight),wave);
             for(int i=0;i<3;i++) ui.Panel(new Rect(Left,LaneYIndex(i),Width,LaneHeight-2),new Color(.03f,.05f,.085f));
             ui.Panel(new Rect(Left,StageY,Width,StageHeight),new Color(.045f,.04f,.08f));
-            ui.Label(Left+6,LaserY+8,120,20,"SAĞ / LAZER",ui.Small,ArcaneVisuals.Cyan); ui.Label(Left+6,MarkY+8,120,20,"İŞARET",ui.Small,LaneColor(2));
-            ui.Label(Left+6,HandY+8,120,20,"SOL / EL",ui.Small,ArcaneVisuals.Crimson); ui.Label(Left+6,StageY+7,120,20,"SAHNE",ui.Small);
+            ui.Label(Left+6,LaserY+8,120,20,"RIGHT / LASER",ui.Small,ArcaneVisuals.Cyan); ui.Label(Left+6,MarkY+8,120,20,"MARK",ui.Small,LaneColor(2));
+            ui.Label(Left+6,HandY+8,120,20,"LEFT / HAND",ui.Small,ArcaneVisuals.Crimson); ui.Label(Left+6,StageY+7,120,20,"STAGE",ui.Small);
             // Grid lines thin out as the view widens, so they never crowd the lanes.
             float step=beat; while(step/viewSpan*Width<14) step*=2;
             int firstLine=Mathf.CeilToInt((float)((viewStart-Mod.BeatOffset)/step));
@@ -483,7 +483,7 @@ namespace ArcaneSaber
             if(!shift) selected.Clear();
             selectedEvent=null;
             foreach(var n in Mod.Notes) if(n.Timestamp>=a && n.Timestamp<=b && !selected.Contains(n)) selected.Add(n);
-            Status=$"{selected.Count} not seçildi.";
+            Status=$"{selected.Count} notes selected.";
         }
     }
 }

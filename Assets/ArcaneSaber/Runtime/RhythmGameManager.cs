@@ -196,44 +196,44 @@ namespace ArcaneSaber
         void RefreshMods() { mods=ModLibrary.List(); confirmDelete=null; }
         void OpenMod(ModMap mod,bool edit)
         {
-            ReleaseMod(); loading=true; notice="Ses yükleniyor...";
+            ReleaseMod(); loading=true; notice="Loading audio...";
             StartCoroutine(AudioLoader.Load(ModLibrary.AudioPath(mod),(clip,error)=>
             {
-                if(!clip) { loading=false; notice="Ses yüklenemedi: "+error; return; }
-                activeMod=mod; activeClip=clip; notice="Müzik analiz ediliyor...";
+                if(!clip) { loading=false; notice="Could not load audio: "+error; return; }
+                activeMod=mod; activeClip=clip; notice="Analyzing music...";
                 StartCoroutine(Analyze(clip,(song,failure)=>
                 {
                     loading=false; notice="";
-                    if(song==null) { notice="Müzik analiz edilemedi: "+failure; ReleaseMod(); return; }
+                    if(song==null) { notice="Could not analyze music: "+failure; ReleaseMod(); return; }
                     activeSong=song;
                     try
                     {
                         if(edit) { editor.Open(mod,clip,activeSong); browsing=false; }
                         else
                         {
-                            if(mod.Notes.Count==mod.UndecidedCount) { notice="Bu modda oynanacak not yok; önce editörde not koy."; ReleaseMod(); return; }
+                            if(mod.Notes.Count==mod.UndecidedCount) { notice="This mod has no playable notes; place notes in the editor first."; ReleaseMod(); return; }
                             Launch(0);
                         }
                     }
-                    catch(Exception e) { Debug.LogException(e); notice="Mod açılamadı: "+e.Message; ReleaseMod(); }
+                    catch(Exception e) { Debug.LogException(e); notice="Could not open mod: "+e.Message; ReleaseMod(); }
                 }));
             }));
         }
         void NewMod()
         {
-            string path=NativeFileDialog.Open("Müzik seç",NativeFileDialog.AudioFilter); if(string.IsNullOrEmpty(path)) return;
+            string path=NativeFileDialog.Open("Choose music",NativeFileDialog.AudioFilter); if(string.IsNullOrEmpty(path)) return;
             Guarded(()=>OpenMod(ModLibrary.Create(path),true));
         }
         void ImportMod()
         {
-            string path=NativeFileDialog.Open("Mod veya BeatSaver haritası içe aktar",NativeFileDialog.ImportFilter); if(string.IsNullOrEmpty(path)) return;
-            Guarded(()=>{ var imported=ModLibrary.Import(path); RefreshMods(); notice=imported.Count==1?$"\"{imported[0].Title}\" içe aktarıldı.":$"{imported.Count} zorluk içe aktarıldı: {imported[0].Title}"; });
+            string path=NativeFileDialog.Open("Import mod or BeatSaver map",NativeFileDialog.ImportFilter); if(string.IsNullOrEmpty(path)) return;
+            Guarded(()=>{ var imported=ModLibrary.Import(path); RefreshMods(); notice=imported.Count==1?$"\"{imported[0].Title}\" imported.":$"{imported.Count} difficulties imported: {imported[0].Title}"; });
         }
         void ExportMod(ModMap mod)
         {
-            string path=NativeFileDialog.Save("Modu dışa aktar",NativeFileDialog.MapFilter,ModLibrary.Extension,ModLibrary.FileSafe(mod.Title)+"."+ModLibrary.Extension);
+            string path=NativeFileDialog.Save("Export mod",NativeFileDialog.MapFilter,ModLibrary.Extension,ModLibrary.FileSafe(mod.Title)+"."+ModLibrary.Extension);
             if(string.IsNullOrEmpty(path)) return;
-            Guarded(()=>{ ModLibrary.Export(mod,path); notice="Dışa aktarıldı: "+path; });
+            Guarded(()=>{ ModLibrary.Export(mod,path); notice="Exported: "+path; });
         }
         void Guarded(Action action)
         {
@@ -387,7 +387,7 @@ namespace ArcaneSaber
             if(editor.Active) { editor.Draw(); return; }
             Panel(new Rect(36,30,3,40),ArcaneVisuals.Crimson);
             Label(52,26,400,24,"A R C A N E  /  S A B E R",body);
-            Label(52,56,400,20,testing?"BÖLÜM TESTİ":activeMod!=null?activeMod.Title:"DUAL-HAND RHYTHM     /     AUDIO REACTIVE",small);
+            Label(52,56,400,20,testing?"SECTION TEST":activeMod!=null?activeMod.Title:"DUAL-HAND RHYTHM     /     AUDIO REACTIVE",small);
             if(browsing) { ModBrowser(); return; }
             if(!started || finished) { Menu(); return; }
             Label(1060,28,320,35,score.Score.ToString("N0"),body);
@@ -412,7 +412,7 @@ namespace ArcaneSaber
             }
             Label(40,836,600,25,"W A S D   /   CONDUCT MAGIC",small,ArcaneVisuals.Crimson);
             Label(1000,836,400,25,"MOUSE   /   LEFT - RIGHT",small,ArcaneVisuals.Cyan);
-            Label(450,865,540,20,testing?"ESC  EDİTÖRE DÖN       R  BÖLÜMÜ TEKRARLA":"ESC  PAUSE       F1  FEEL LAB       R  RESTART",subtitle);
+            Label(450,865,540,20,testing?"ESC  BACK TO EDITOR       R  REPEAT SECTION":"ESC  PAUSE       F1  FEEL LAB       R  RESTART",subtitle);
             if(music.Paused)
             {
                 Panel(new Rect(0,0,1440,900),new Color(.004f,.008f,.018f,.94f));
@@ -423,7 +423,7 @@ namespace ArcaneSaber
                     Label(440,366,560,35,"YOUR SESSION IS PAUSED",subtitle);
                     if(GUI.Button(new Rect(570,440,300,56),"RESUME  /  ESC",button)) { music.TogglePause(); Lock(); }
                     if(GUI.Button(new Rect(570,512,300,48),"OPEN FEEL LAB",button)) tuning=true;
-                    if(GUI.Button(new Rect(570,574,300,48),"MENÜYE DÖN",button)) { music.Stop(); notes.Reset(); started=false; browsing=activeMod!=null; ReleaseMod(); RefreshMods(); }
+                    if(GUI.Button(new Rect(570,574,300,48),"BACK TO MENU",button)) { music.Stop(); notes.Reset(); started=false; browsing=activeMod!=null; ReleaseMod(); RefreshMods(); }
                 }
             }
         }
@@ -438,34 +438,34 @@ namespace ArcaneSaber
             if(packagedSong) Label(440,520,560,42,"BEATSAVER  /  EXPERT STANDARD",body);
             else difficulty=GUI.SelectionGrid(new Rect(440,520,560,42),difficulty,new[]{"INITIATE","ADEPT","VIRTUOSO"},3,button);
             if(GUI.Button(new Rect(500,580,440,60),finished?"PLAY AGAIN  /  ENTER":"ENTER THE FLOW  /  ENTER",button)) { if(!finished) ReleaseMod(); StartSession(); }
-            if(GUI.Button(new Rect(500,652,440,52),"MODLAR  /  EDİTÖR",button)) { if(finished) ReleaseMod(); finished=false; started=false; browsing=true; RefreshMods(); }
+            if(GUI.Button(new Rect(500,652,440,52),"MODS  /  EDITOR",button)) { if(finished) ReleaseMod(); finished=false; started=false; browsing=true; RefreshMods(); }
             Label(370,720,700,35,"F1  live spring tuning     •     ESC  pause     •     R  restart",subtitle);
         }
         void ModBrowser()
         {
             Panel(new Rect(170,90,1100,740),new Color(.008f,.012f,.03f,.82f));
-            Label(200,104,1040,60,"MODLAR",title);
-            Label(200,168,1040,24,"Müziğini yükle, notlarını koy, oyna, paylaş.",subtitle,ArcaneVisuals.Cyan);
+            Label(200,104,1040,60,"MODS",title);
+            Label(200,168,1040,24,"Load your music, place your notes, play, share.",subtitle,ArcaneVisuals.Cyan);
             GUI.enabled=!loading;
-            if(GUI.Button(new Rect(210,204,330,50),"+  YENİ MOD  /  MÜZİK SEÇ",button)) pending=NewMod;
-            if(GUI.Button(new Rect(552,204,230,50),"İÇE AKTAR",button)) pending=ImportMod;
-            if(GUI.Button(new Rect(794,204,216,50),"KLASÖRÜ AÇ",button)) Application.OpenURL(new Uri(ModLibrary.Root+Path.DirectorySeparatorChar).AbsoluteUri);
-            if(GUI.Button(new Rect(1022,204,206,50),"GERİ  /  ESC",button)) browsing=false;
-            if(!NativeFileDialog.Supported) Label(210,258,1020,20,"Bu platformda dosya penceresi yok; modları Mods klasörüne elle kopyala.",subtitle);
+            if(GUI.Button(new Rect(210,204,330,50),"+  NEW MOD  /  CHOOSE MUSIC",button)) pending=NewMod;
+            if(GUI.Button(new Rect(552,204,230,50),"IMPORT",button)) pending=ImportMod;
+            if(GUI.Button(new Rect(794,204,216,50),"OPEN FOLDER",button)) Application.OpenURL(new Uri(ModLibrary.Root+Path.DirectorySeparatorChar).AbsoluteUri);
+            if(GUI.Button(new Rect(1022,204,206,50),"BACK  /  ESC",button)) browsing=false;
+            if(!NativeFileDialog.Supported) Label(210,258,1020,20,"No file dialog on this platform; copy mods into the Mods folder manually.",subtitle);
             Rect area=new Rect(210,284,1020,480);
-            if(mods.Count==0) Label(210,420,1020,40,"Henüz mod yok. YENİ MOD ile bir müzik seç.",body);
+            if(mods.Count==0) Label(210,420,1020,40,"No mods yet. Choose some music with NEW MOD.",body);
             modScroll=GUI.BeginScrollView(area,modScroll,new Rect(0,0,1000,Mathf.Max(480,mods.Count*68)));
             for(int i=0;i<mods.Count;i++)
             {
                 var mod=mods[i]; float y=i*68;
                 Panel(new Rect(0,y,1000,60),new Color(.04f,.06f,.1f,.9f));
                 Label(14,y+6,470,28,mod.Title,accent);
-                Label(14,y+32,470,20,$"{mod.Notes.Count} not     {mod.Events.Count} sahne olayı     {(mod.UndecidedCount>0?mod.UndecidedCount+" kararsız":"")}",small);
-                if(GUI.Button(new Rect(490,y+10,110,40),"OYNA",button)) OpenMod(mod,false);
-                if(GUI.Button(new Rect(606,y+10,120,40),"DÜZENLE",button)) OpenMod(mod,true);
-                if(GUI.Button(new Rect(732,y+10,120,40),"DIŞA AKTAR",button)) { var chosen=mod; pending=()=>ExportMod(chosen); }
+                Label(14,y+32,470,20,$"{mod.Notes.Count} notes     {mod.Events.Count} stage events     {(mod.UndecidedCount>0?mod.UndecidedCount+" undecided":"")}",small);
+                if(GUI.Button(new Rect(490,y+10,110,40),"PLAY",button)) OpenMod(mod,false);
+                if(GUI.Button(new Rect(606,y+10,120,40),"EDIT",button)) OpenMod(mod,true);
+                if(GUI.Button(new Rect(732,y+10,120,40),"EXPORT",button)) { var chosen=mod; pending=()=>ExportMod(chosen); }
                 bool armed=confirmDelete==mod.Id;
-                if(GUI.Button(new Rect(858,y+10,130,40),armed?"EMİN MİSİN?":"SİL",button))
+                if(GUI.Button(new Rect(858,y+10,130,40),armed?"SURE?":"DELETE",button))
                 {
                     if(armed) { Guarded(()=>ModLibrary.Delete(mod)); RefreshMods(); GUI.EndScrollView(); GUI.enabled=true; return; }
                     confirmDelete=mod.Id;

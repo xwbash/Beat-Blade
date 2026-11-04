@@ -232,7 +232,7 @@ namespace ArcaneSaber.Editor
                     ("Hard.dat","{\"version\":\"4.0.0\",\"colorNotes\":[{\"b\":5,\"i\":0,\"r\":0},{\"b\":10,\"i\":1,\"r\":0}],\"colorNotesData\":[{\"x\":1,\"y\":0,\"c\":1,\"d\":3},{\"x\":1,\"y\":2,\"c\":0,\"d\":0}]}"),
                     ("Lights.dat","{\"version\":\"4.0.0\",\"basicEvents\":[{\"b\":5,\"i\":0}],\"basicEventsData\":[{\"t\":8,\"i\":0,\"f\":0}]}"));
                 var fours=ModLibrary.Import(v4); imported.AddRange(fours); var four=fours[fours.Count-1];
-                Assert(fours.Count==3 && fours[0].Title.Contains("[Kolay]") && fours[1].Title.Contains("[Orta]"),"BeatSaver: a map without Easy/Normal also gets thinned keyboard versions");
+                Assert(fours.Count==3 && fours[0].Title.Contains("[Easy]") && fours[1].Title.Contains("[Medium]"),"BeatSaver: a map without Easy/Normal also gets thinned keyboard versions");
                 Assert(four.Title.StartsWith("Four") && four.Title.Contains("[Hard]") && four.Notes.Count==2 && Mathf.Abs(four.Notes[0].Timestamp-3)<.001f && four.Notes[0].Lane==1 && four.Notes[0].Direction==3 && four.Notes[1].Lane==0 && four.Notes[1].Direction==0,"BeatSaver v4 notes");
                 Assert(four.Events.Exists(e=>e.Kind==(int)StageKind.RingSpin),"BeatSaver v4 lightshow file");
             }

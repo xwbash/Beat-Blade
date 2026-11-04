@@ -61,7 +61,7 @@ namespace ArcaneSaber
             return x==0?1:2;
         }
         // Keyboard-friendly versions of a dense map: minimum gap per hand, and between any two notes.
-        static readonly (string name,float hand,float any)[] Thinned={("Kolay",.55f,.24f),("Orta",.34f,.14f)};
+        static readonly (string name,float hand,float any)[] Thinned={("Easy",.55f,.24f),("Medium",.34f,.14f)};
         static ModMap Thin(ModMap source,float handGap,float anyGap)
         {
             var mod=JsonUtility.FromJson<ModMap>(JsonUtility.ToJson(source)); mod.Notes.Clear();
@@ -85,7 +85,7 @@ namespace ArcaneSaber
         public static bool Detect(ZipArchive zip) => Find(zip,"Info.dat")!=null;
         static T Read<T>(ZipArchiveEntry entry)
         {
-            if(entry.Length>MaximumChartBytes) throw new InvalidOperationException("Harita dosyası çok büyük: "+entry.Name);
+            if(entry.Length>MaximumChartBytes) throw new InvalidOperationException("Map file is too large: "+entry.Name);
             using(var reader=new StreamReader(entry.Open())) return JsonUtility.FromJson<T>(reader.ReadToEnd());
         }
         public static List<ModMap> Convert(ZipArchive zip)
@@ -96,12 +96,12 @@ namespace ArcaneSaber
             string songFile=v4?info.audio.songFilename:info._songFilename; float bpm=v4?info.audio.bpm:info._beatsPerMinute;
             float offset=v4?0:info._songTimeOffset;
             var audio=Find(zip,songFile);
-            if(audio==null) throw new InvalidOperationException("Haritanın müzik dosyası zip içinde yok: "+songFile);
+            if(audio==null) throw new InvalidOperationException("The map's music file is missing from the zip: "+songFile);
             string extension=Path.GetExtension(audio.Name).ToLowerInvariant();
             // .egg is Ogg Vorbis with a different name.
             if(extension==".egg") extension=".ogg";
-            if(extension!=".ogg" && extension!=".wav" && extension!=".mp3") throw new InvalidOperationException("Desteklenmeyen müzik türü: "+audio.Name);
-            if(bpm<=0) throw new InvalidOperationException("Haritanın BPM değeri geçersiz.");
+            if(extension!=".ogg" && extension!=".wav" && extension!=".mp3") throw new InvalidOperationException("Unsupported music format: "+audio.Name);
+            if(bpm<=0) throw new InvalidOperationException("The map's BPM value is invalid.");
 
             var levels=new List<Level>();
             if(v4 && info.difficultyBeatmaps!=null)
@@ -113,7 +113,7 @@ namespace ArcaneSaber
             bool hasStandard=levels.Exists(l=>l.Characteristic=="Standard");
             levels.RemoveAll(l=>hasStandard?l.Characteristic!="Standard":(l.Characteristic=="360Degree" || l.Characteristic=="90Degree" || l.Characteristic=="Lightshow"));
             levels.Sort((a,b)=>Array.IndexOf(Order,a.Name).CompareTo(Array.IndexOf(Order,b.Name)));
-            if(levels.Count==0) throw new InvalidOperationException("Zip içinde oynanabilir zorluk yok.");
+            if(levels.Count==0) throw new InvalidOperationException("No playable difficulty in the zip.");
 
             var mods=new List<ModMap>();
             // Without an Easy or Normal chart, the easiest one also yields thinned keyboard versions.
@@ -137,7 +137,7 @@ namespace ArcaneSaber
                         foreach(var t in Thinned)
                         {
                             var easier=Thin(mod,t.hand,t.any); easier.Title=name+"  ["+t.name+"]";
-                            easier.NoteSpeed=Mathf.Min(mod.NoteSpeed,t.name=="Kolay"?10:12);
+                            easier.NoteSpeed=Mathf.Min(mod.NoteSpeed,t.name=="Easy"?10:12);
                             ModLibrary.Install(easier,audio,extension); mods.Add(easier);
                         }
                     }
@@ -146,7 +146,7 @@ namespace ArcaneSaber
                 }
             }
             catch { foreach(var mod in mods) ModLibrary.Delete(mod); throw; }
-            if(mods.Count==0) throw new InvalidOperationException("Haritada dönüştürülebilir not bulunamadı.");
+            if(mods.Count==0) throw new InvalidOperationException("No convertible notes found in the map.");
             return mods;
         }
         public static BeatmapController Packaged(AudioClip audio)
