@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
+  m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -149,7 +149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ArcaneSaber.RhythmGameManager
   Settings: {fileID: 11400000, guid: c95a3967eb61a024c8c77bf311ee1e8f, type: 2}
-  CustomBeatmap: {fileID: 0}
+  CustomBeatmap: {fileID: 11400000, guid: be9dd98c7d201d340b072d1ce5275433, type: 2}
+  MusicTrack: {fileID: 0}
 --- !u!4 &356801156
 Transform:
   m_ObjectHideFlags: 0

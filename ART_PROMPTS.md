@@ -1,4 +1,4 @@
-# Arcane Saber — Image and Model Prompts
+# Beat and Blade — Image and Model Prompts
 
 Generate each image in a separate ChatGPT chat (with image generation enabled). Paste the prompt below **as is**.
 
@@ -60,7 +60,7 @@ A circular arcane magic sigil frame, glowing pure white neon lines with a soft h
 ## 6. Logo.png — menu logo
 
 ```
-Game logo wordmark "ARCANE SABER" for a neon VR-style rhythm game. Bold wide futuristic sans-serif letters, the word ARCANE in glowing crimson-magenta and SABER in glowing cyan, a thin glowing sword blade slicing diagonally through the letters, subtle arcane rune details. TRANSPARENT BACKGROUND (PNG with alpha), no other elements, no tagline, centered, landscape 3:2, crisp edges.
+Game logo wordmark "BEAT & BLADE" for a neon VR-style rhythm game. Bold wide futuristic sans-serif letters, the word BEAT in glowing crimson-magenta and BLADE in glowing cyan, a thin glowing sword blade slicing diagonally through the letters, subtle arcane rune details. TRANSPARENT BACKGROUND (PNG with alpha), no other elements, no tagline, centered, landscape 3:2, crisp edges.
 ```
 
 ---

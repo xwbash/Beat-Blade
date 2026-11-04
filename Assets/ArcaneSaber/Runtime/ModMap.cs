@@ -22,7 +22,7 @@ namespace ArcaneSaber
         public const int Undecided=2; // Note lane of a K marker that has no hand yet.
         public int Format=1;
         public float JumpOffset;
-        public string Id="",Title="Yeni Mod",Artist="",AudioFile="";
+        public string Id="",Title="New Mod",Artist="",AudioFile="";
         public float BPM=120,BeatOffset,NoteSpeed=11,HitWindow=.16f,LightPower=1,CameraPower=1,BloomPower=1;
         public List<RhythmNote> Notes=new List<RhythmNote>();
         public List<StageEvent> Events=new List<StageEvent>();
@@ -128,7 +128,7 @@ namespace ArcaneSaber
                     if(entry.FullName=="map.json") json=entry;
                     else if(entry.FullName==Path.GetFileName(entry.FullName) && Supported(Path.GetExtension(entry.FullName))) audio=entry;
                 }
-                if(json==null || audio==null) throw new InvalidOperationException("The file is not a valid Arcane Saber mod.");
+                if(json==null || audio==null) throw new InvalidOperationException("The file is not a valid Beat and Blade mod.");
                 if(json.Length>MaximumMapBytes || audio.Length>MaximumAudioBytes) throw new InvalidOperationException("Mod file is too large.");
                 ModMap mod;
                 using(var reader=new StreamReader(json.Open())) mod=JsonUtility.FromJson<ModMap>(reader.ReadToEnd());

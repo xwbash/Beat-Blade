@@ -1,4 +1,4 @@
-# A Rhythm Game Without VR 🎵⚔️
+# Beat and Blade — A Rhythm Game Without VR 🎵⚔️
 
 **What if you could experience VR-inspired rhythm gameplay using just your keyboard and mouse?**
 

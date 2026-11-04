@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ArcaneSaber
 {
-    [CreateAssetMenu(menuName = "Arcane Saber/Game Feel Settings")]
+    [CreateAssetMenu(menuName = "Beat and Blade/Game Feel Settings")]
     public sealed class GameFeelSettings : ScriptableObject
     {
         [Header("Flow assistance • 0 = strict, 1 = relaxed")]

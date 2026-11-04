@@ -51,7 +51,7 @@ namespace ArcaneSaber.Editor
             }
             AssetDatabase.SaveAssets();
         }
-        [MenuItem("Arcane Saber/Open Playable Scene")]
+        [MenuItem("Beat and Blade/Open Playable Scene")]
         public static void OpenScene()
         {
             EnsureAssets();
@@ -62,7 +62,7 @@ namespace ArcaneSaber.Editor
                 bool additive=!string.IsNullOrEmpty(previous.path);
                 var scene=EditorSceneManager.NewScene(NewSceneSetup.EmptyScene,additive?NewSceneMode.Additive:NewSceneMode.Single);
                 SceneManager.SetActiveScene(scene);
-                var manager=new GameObject("ARCANE SABER").AddComponent<RhythmGameManager>();
+                var manager=new GameObject("BEAT AND BLADE").AddComponent<RhythmGameManager>();
                 manager.Settings=AssetDatabase.LoadAssetAtPath<GameFeelSettings>("Assets/ArcaneSaber/Resources/ArcaneGameFeel.asset");
                 EditorSceneManager.SaveScene(scene,ScenePath);
                 if(additive) { EditorSceneManager.CloseScene(scene,true); SceneManager.SetActiveScene(previous); }
@@ -70,16 +70,16 @@ namespace ArcaneSaber.Editor
             EditorSceneManager.OpenScene(ScenePath);
             EditorBuildSettings.scenes=new[]{new EditorBuildSettingsScene(ScenePath,true)};
         }
-        [MenuItem("Arcane Saber/Play")]
+        [MenuItem("Beat and Blade/Play")]
         public static void Play() { OpenScene(); EditorApplication.isPlaying=true; }
-        [MenuItem("Arcane Saber/Build Windows Player")]
+        [MenuItem("Beat and Blade/Build Windows Player")]
         public static void Build()
         {
             OpenScene(); Directory.CreateDirectory("Builds/ArcaneSaber");
             var result=BuildPipeline.BuildPlayer(new[]{ScenePath},"Builds/ArcaneSaber/ArcaneSaber.exe",BuildTarget.StandaloneWindows64,BuildOptions.None);
-            if(result.summary.result!=UnityEditor.Build.Reporting.BuildResult.Succeeded) throw new Exception("Arcane Saber build failed: "+result.summary.result);
+            if(result.summary.result!=UnityEditor.Build.Reporting.BuildResult.Succeeded) throw new Exception("Beat and Blade build failed: "+result.summary.result);
         }
-        [MenuItem("Arcane Saber/Run Gameplay Checks")]
+        [MenuItem("Beat and Blade/Run Gameplay Checks")]
         public static void Check()
         {
             void Assert(bool condition,string message) { if(!condition) throw new Exception("ARCANE CHECK FAILED: "+message); }

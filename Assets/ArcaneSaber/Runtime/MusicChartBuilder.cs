@@ -12,7 +12,7 @@ namespace ArcaneSaber
             if(clip.loadState!=AudioDataLoadState.Loaded) clip.LoadAudioData();
             if(clip.length>600) throw new InvalidOperationException("Use a music track shorter than ten minutes.");
             float[] pcm=new float[clip.samples*clip.channels];
-            if(!clip.GetData(pcm,0)) throw new InvalidOperationException("Music must use Decompress On Load. Use Arcane Saber > Import Music.");
+            if(!clip.GetData(pcm,0)) throw new InvalidOperationException("Music must use Decompress On Load. Use Beat and Blade > Import Music.");
             int hop=Mathf.Max(1,clip.frequency/100),count=clip.samples/hop;
             float[] energy=new float[count],novelty=new float[count];
             float previous=0;

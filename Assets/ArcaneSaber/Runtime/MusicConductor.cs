@@ -80,17 +80,19 @@ namespace ArcaneSaber
                 double pad=(Math.Sin(2*Math.PI*bassHz*4*t)+Math.Sin(2*Math.PI*bassHz*6*t))*.035*(.6+.4*Math.Sin(bar/beat*Math.PI/4));
                 pcm[i]=(float)Math.Tanh((kick+bass+hat+snare+lead+pad)*.9)*Mathf.Clamp01((float)t*2);
             }
-            var clip=AudioClip.Create("Arcane • original procedural session",length,1,rate,false);
+            var clip=AudioClip.Create("Beat and Blade • original procedural session",length,1,rate,false);
             clip.SetData(pcm,0); return clip;
         }
     }
 
     public sealed class ScoreManager
     {
-        public int Score, Combo, BestCombo, Hits, Misses, Total;
+        public int Score, Combo, BestCombo, Hits, Misses, Total, Perfects, Greats, Goods;
         public float AccuracySum;
         public string Judgment = "FIND YOUR FLOW";
-        public float LastJudgment;
+        public float LastJudgment, LastError;
+        public string Rank => Total == 0 ? "-" : Accuracy >= 95 ? "S" : Accuracy >= 88 ? "A" : Accuracy >= 78 ? "B" : Accuracy >= 65 ? "C" : "D";
+        public bool FullCombo => Total > 0 && Misses == 0;
         public float Accuracy => Total == 0 ? 100 : 100*AccuracySum/Total;
         public void Hit(float error, float window)
         {
@@ -99,6 +101,8 @@ namespace ArcaneSaber
             AccuracySum+=quality;
             Score+=Mathf.RoundToInt((70+30*quality)*(1+Mathf.Min(Combo/8,7)));
             Judgment=Mathf.Abs(error)<.055f ? "PERFECT" : Mathf.Abs(error)<.11f ? "GREAT" : "GOOD";
+            if(Judgment=="PERFECT") Perfects++; else if(Judgment=="GREAT") Greats++; else Goods++;
+            LastError=error;
             LastJudgment=Time.unscaledTime;
         }
         public void Miss(string reason = "MISS") { Combo=0; Misses++; Total++; Judgment=reason; LastJudgment=Time.unscaledTime; }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ArcaneSaber
 {
-    [CreateAssetMenu(menuName = "Arcane Saber/Beatmap")]
+    [CreateAssetMenu(menuName = "Beat and Blade/Beatmap")]
     public sealed class BeatmapController : ScriptableObject
     {
         public AudioClip Music;

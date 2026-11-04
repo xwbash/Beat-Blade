@@ -9,7 +9,7 @@ using UnityEngine.Rendering.HighDefinition;
 
 namespace ArcaneSaber
 {
-    public sealed class RhythmGameManager : MonoBehaviour
+    public sealed partial class RhythmGameManager : MonoBehaviour
     {
         public GameFeelSettings Settings;
         public BeatmapController CustomBeatmap;
@@ -26,13 +26,13 @@ namespace ArcaneSaber
         internal GUIStyle Body=>body; internal GUIStyle Small=>small; internal GUIStyle Subtitle=>subtitle; internal GUIStyle ButtonStyle=>button;
         internal GUIStyle Tiny=>tiny; internal GUIStyle Accent=>accent; internal GUIStyle LeftButton=>leftButton;
         internal float LatencySeconds=>latency*.001f;
-        Vector2 settingsScroll,modScroll; double calibrationStart; readonly List<float> taps=new List<float>(); bool calibrating;
+        double calibrationStart; readonly List<float> taps=new List<float>(); bool calibrating;
         AudioSource metronome; AudioClip clickTrack;
         // Mod session: what is loaded, plus where a section test should return to.
         ModMap activeMod; AudioClip activeClip; SongAnalysis activeSong; bool testing; double testPoint;
         bool browsing,loading; string notice=""; List<ModMap> mods=new List<ModMap>(); string confirmDelete; Action pending;
         readonly BeatmapController[] builtInCharts=new BeatmapController[3]; List<StageEvent> builtInStage; float judgmentAge;
-        Texture2D logo; bool logoChecked; SongAnalysis builtInSong; System.Threading.Tasks.Task<SongAnalysis> builtInWork; HitSounds hits;
+        SongAnalysis builtInSong; System.Threading.Tasks.Task<SongAnalysis> builtInWork; HitSounds hits;
         internal HitSounds Hits=>hits;
         // Samples are read on the main thread; the spectral analysis runs on a worker.
         static IEnumerator Analyze(AudioClip clip,Action<SongAnalysis,string> done)
@@ -54,12 +54,13 @@ namespace ArcaneSaber
         static void Bootstrap()
         {
             if(FindFirstObjectByType<RhythmGameManager>()) return;
-            new GameObject("ARCANE SABER • runtime").AddComponent<RhythmGameManager>();
+            new GameObject("BEAT AND BLADE • runtime").AddComponent<RhythmGameManager>();
         }
         void Awake()
         {
             Application.targetFrameRate=144;
             foreach(var root in gameObject.scene.GetRootGameObjects()) if(root!=gameObject) root.SetActive(false);
+            MigrateLegacyData();
             Settings=Settings ? Instantiate(Settings) : Resources.Load<GameFeelSettings>("ArcaneGameFeel");
             Settings=Settings ? Instantiate(Settings) : ScriptableObject.CreateInstance<GameFeelSettings>();
             string savedFeel=Path.Combine(Application.persistentDataPath,"ArcaneGameFeel.json");
@@ -105,6 +106,7 @@ namespace ArcaneSaber
                 catch(Exception e) { Debug.LogWarning("Music analysis unavailable: "+e.Message); }
             }
             editor=new MapEditor(this,music,notes,stage){Test=BeginTest,Exit=LeaveEditor};
+            BuildInterface(); RefreshMods();
             Unlock();
         }
         void BindEvaluator()
@@ -120,8 +122,9 @@ namespace ArcaneSaber
                 destruction.DestroyCube(pos,isMagic,direction,perfect); cameraMotion.Impact(direction);
                 hits.Play(isMagic,perfect,(float)(n.Data.Timestamp-(music.SongTime-latency*.001f)),isMagic?-.35f:.35f);
                 stage.Hit(isMagic,perfect); stage.SetCombo(score.Combo); judgmentAge=0;
+                FeelHit(isMagic,perfect,error);
             };
-            evaluator.Missed+=n=>{ stage.Miss(); cameraMotion.Kick(.35f); judgmentAge=0; };
+            evaluator.Missed+=n=>{ stage.Miss(); cameraMotion.Kick(.35f); judgmentAge=0; FeelMiss(); };
         }
         void OnMagic(int direction)
         {
@@ -176,6 +179,7 @@ namespace ArcaneSaber
                 generated=MusicConductor.Synthesize(generatedBpm,generatedBeats);
             }
             notes.SkipTo(map,from); music.Begin(map,generated,from); started=true; finished=false; tuning=false; browsing=false; Lock();
+            BeginRunFeel(from);
         }
         // Tests lead in a moment before the playhead, so the section starts in rhythm.
         void BeginTest(double time)
@@ -193,7 +197,7 @@ namespace ArcaneSaber
             editor.Close(); ReleaseMod(); started=false; browsing=true; RefreshMods(); Unlock();
         }
         void ReleaseMod() { if(activeClip) Destroy(activeClip); activeClip=null; activeSong=null; activeMod=null; }
-        void RefreshMods() { mods=ModLibrary.List(); confirmDelete=null; }
+        void RefreshMods() { mods=ModLibrary.List(); confirmDelete=null; modsDirty=true; }
         void OpenMod(ModMap mod,bool edit)
         {
             ReleaseMod(); loading=true; notice="Loading audio...";
@@ -253,7 +257,8 @@ namespace ArcaneSaber
             }
             if(k!=null)
             {
-                if(k.enterKey.wasPressedThisFrame && !browsing && (!started || finished)) StartSession();
+                if(k.enterKey.wasPressedThisFrame && !browsing && !tuning && !loading && (!started || finished)) StartSession();
+                if(k.escapeKey.wasPressedThisFrame && tuning && !started) tuning=false;
                 if(k.escapeKey.wasPressedThisFrame && testing) { EndTest(); return; }
                 if(k.escapeKey.wasPressedThisFrame && browsing && !loading) browsing=false;
                 if(k.escapeKey.wasPressedThisFrame && started && !finished)
@@ -265,7 +270,7 @@ namespace ArcaneSaber
                 {
                     float now=(float)(AudioSettings.dspTime-calibrationStart);
                     float beat=60f/112; if(now>beat*2) taps.Add((now/beat-Mathf.Round(now/beat))*beat*1000);
-                    if(taps.Count>=12) { taps.Sort(); latency=Mathf.Clamp(taps[taps.Count/2],-200,200); calibrating=false; metronome.Stop(); PlayerPrefs.SetFloat("Arcane.Latency",latency); }
+                    if(taps.Count>=12) { taps.Sort(); latency=Mathf.Clamp(taps[taps.Count/2],-200,200); calibrating=false; metronome.Stop(); PlayerPrefs.SetFloat("Arcane.Latency",latency); RefreshFeel(); }
                 }
             }
             if(calibrating && !tuning) { calibrating=false; if(metronome) metronome.Stop(); }
@@ -285,7 +290,7 @@ namespace ArcaneSaber
                 if(music.SongTime>end)
                 {
                     if(testing) EndTest();
-                    else { finished=true; music.Stop(); Unlock(); }
+                    else { finished=true; music.Stop(); Unlock(); RecordBest(); }
                 }
             }
             judgmentAge+=dt;
@@ -380,160 +385,18 @@ namespace ArcaneSaber
         internal void Label(float x,float y,float w,float h,string text,GUIStyle style,Color? color=null)
         { Color old=GUI.color; if(color.HasValue) GUI.color=color.Value; GUI.Label(new Rect(x,y,w,h),text,style); GUI.color=old; }
         internal void Panel(Rect r,Color c) { Color old=GUI.color; GUI.color=c; GUI.DrawTexture(r,Texture2D.whiteTexture); GUI.color=old; }
+        // The game screens are UI Toolkit (RhythmGameManager.Interface.cs); IMGUI only draws the map editor.
         void OnGUI()
         {
+            if(!editor.Active) return;
             Styles(); GUI.matrix=Matrix4x4.Scale(new Vector3(Screen.width/1440f,Screen.height/900f,1));
-            if(stage.Overlay.a>.004f) Panel(new Rect(0,0,1440,900),stage.Overlay);
-            if(editor.Active) { editor.Draw(); return; }
-            Panel(new Rect(36,30,3,40),ArcaneVisuals.Crimson);
-            Label(52,26,400,24,"A R C A N E  /  S A B E R",body);
-            Label(52,56,400,20,testing?"SECTION TEST":activeMod!=null?activeMod.Title:"DUAL-HAND RHYTHM     /     AUDIO REACTIVE",small);
-            if(browsing) { ModBrowser(); return; }
-            if(!started || finished) { Menu(); return; }
-            Label(1060,28,320,35,score.Score.ToString("N0"),body);
-            Label(1060,65,320,20,$"ACCURACY {score.Accuracy:0.0}%     /     BEST {score.BestCombo}",subtitle);
-            float end=map.Notes.Count>0?map.Notes[map.Notes.Count-1].Timestamp:1;
-            Panel(new Rect(40,100,1360,2),new Color(.08f,.13f,.19f));
-            Panel(new Rect(40,100,1360*Mathf.Clamp01((float)music.SongTime/end),2),ArcaneVisuals.Cyan);
-            Panel(new Rect(40,104,1360*stage.Heat,2),Color.Lerp(ArcaneVisuals.Crimson,Color.white,stage.Heat));
-            // Combo and judgment pop on each hit, then settle.
-            float pop=Mathf.Exp(-judgmentAge*11);
-            if(score.Combo>0)
-            {
-                huge.fontSize=Mathf.RoundToInt(45+pop*16+stage.Heat*14);
-                Label(480,142,480,76,score.Combo.ToString(),huge); Label(580,214,280,25,$"C O M B O     x{1+Mathf.Min(score.Combo/8,7)}",subtitle);
-            }
-            if(Time.unscaledTime-score.LastJudgment<.65f)
-            {
-                body.fontSize=Mathf.RoundToInt(20+pop*14);
-                bool perfect=score.Judgment=="PERFECT";
-                Label(420,272,600,50,score.Judgment,body,score.Judgment=="MISS"?ArcaneVisuals.Crimson:perfect?Color.white:ArcaneVisuals.Cyan);
-                body.fontSize=20;
-            }
-            Label(40,836,600,25,"W A S D   /   CONDUCT MAGIC",small,ArcaneVisuals.Crimson);
-            Label(1000,836,400,25,"MOUSE   /   LEFT - RIGHT",small,ArcaneVisuals.Cyan);
-            Label(450,865,540,20,testing?"ESC  BACK TO EDITOR       R  REPEAT SECTION":"ESC  PAUSE       F1  FEEL LAB       R  RESTART",subtitle);
-            if(music.Paused)
-            {
-                Panel(new Rect(0,0,1440,900),new Color(.004f,.008f,.018f,.94f));
-                if(tuning) FeelLab();
-                else
-                {
-                    Label(400,270,640,80,"TAKE A BREATH",title);
-                    Label(440,366,560,35,"YOUR SESSION IS PAUSED",subtitle);
-                    if(GUI.Button(new Rect(570,440,300,56),"RESUME  /  ESC",button)) { music.TogglePause(); Lock(); }
-                    if(GUI.Button(new Rect(570,512,300,48),"OPEN FEEL LAB",button)) tuning=true;
-                    if(GUI.Button(new Rect(570,574,300,48),"BACK TO MENU",button)) { music.Stop(); notes.Reset(); started=false; browsing=activeMod!=null; ReleaseMod(); RefreshMods(); }
-                }
-            }
+            editor.Draw();
         }
-        void Menu()
+        void SaveFeel()
         {
-            Panel(new Rect(270,170,900,620),new Color(.008f,.012f,.03f,.72f));
-            Label(370,200,700,35,finished?"S E S S I O N  C O M P L E T E":"T W O  H A N D S .   O N E  F L O W .",subtitle,ArcaneVisuals.Cyan);
-            if(!logoChecked) { logo=ArcaneArt.Texture("Logo"); logoChecked=true; }
-            if(logo) GUI.DrawTexture(new Rect(420,246,600,104),logo,ScaleMode.ScaleToFit); else Label(300,252,840,90,"ARCANE SABER",title);
-            Label(340,350,760,40,finished?$"{score.Score:N0} POINTS    /    {score.Accuracy:0.0}%    /    BEST COMBO {score.BestCombo}":"Conduct the crimson. Carve the cyan.",body);
-            Label(365,420,710,80,"W A S D  —  match the letters as they cross the gate.\nMOUSE  —  alternate left and right through the cubes.",subtitle);
-            if(packagedSong) Label(440,520,560,42,"BEATSAVER  /  EXPERT STANDARD",body);
-            else difficulty=GUI.SelectionGrid(new Rect(440,520,560,42),difficulty,new[]{"INITIATE","ADEPT","VIRTUOSO"},3,button);
-            if(GUI.Button(new Rect(500,580,440,60),finished?"PLAY AGAIN  /  ENTER":"ENTER THE FLOW  /  ENTER",button)) { if(!finished) ReleaseMod(); StartSession(); }
-            if(GUI.Button(new Rect(500,652,440,52),"MODS  /  EDITOR",button)) { if(finished) ReleaseMod(); finished=false; started=false; browsing=true; RefreshMods(); }
-            Label(370,720,700,35,"F1  live spring tuning     •     ESC  pause     •     R  restart",subtitle);
-        }
-        void ModBrowser()
-        {
-            Panel(new Rect(170,90,1100,740),new Color(.008f,.012f,.03f,.82f));
-            Label(200,104,1040,60,"MODS",title);
-            Label(200,168,1040,24,"Load your music, place your notes, play, share.",subtitle,ArcaneVisuals.Cyan);
-            GUI.enabled=!loading;
-            if(GUI.Button(new Rect(210,204,330,50),"+  NEW MOD  /  CHOOSE MUSIC",button)) pending=NewMod;
-            if(GUI.Button(new Rect(552,204,230,50),"IMPORT",button)) pending=ImportMod;
-            if(GUI.Button(new Rect(794,204,216,50),"OPEN FOLDER",button)) Application.OpenURL(new Uri(ModLibrary.Root+Path.DirectorySeparatorChar).AbsoluteUri);
-            if(GUI.Button(new Rect(1022,204,206,50),"BACK  /  ESC",button)) browsing=false;
-            if(!NativeFileDialog.Supported) Label(210,258,1020,20,"No file dialog on this platform; copy mods into the Mods folder manually.",subtitle);
-            Rect area=new Rect(210,284,1020,480);
-            if(mods.Count==0) Label(210,420,1020,40,"No mods yet. Choose some music with NEW MOD.",body);
-            modScroll=GUI.BeginScrollView(area,modScroll,new Rect(0,0,1000,Mathf.Max(480,mods.Count*68)));
-            for(int i=0;i<mods.Count;i++)
-            {
-                var mod=mods[i]; float y=i*68;
-                Panel(new Rect(0,y,1000,60),new Color(.04f,.06f,.1f,.9f));
-                Label(14,y+6,470,28,mod.Title,accent);
-                Label(14,y+32,470,20,$"{mod.Notes.Count} notes     {mod.Events.Count} stage events     {(mod.UndecidedCount>0?mod.UndecidedCount+" undecided":"")}",small);
-                if(GUI.Button(new Rect(490,y+10,110,40),"PLAY",button)) OpenMod(mod,false);
-                if(GUI.Button(new Rect(606,y+10,120,40),"EDIT",button)) OpenMod(mod,true);
-                if(GUI.Button(new Rect(732,y+10,120,40),"EXPORT",button)) { var chosen=mod; pending=()=>ExportMod(chosen); }
-                bool armed=confirmDelete==mod.Id;
-                if(GUI.Button(new Rect(858,y+10,130,40),armed?"SURE?":"DELETE",button))
-                {
-                    if(armed) { Guarded(()=>ModLibrary.Delete(mod)); RefreshMods(); GUI.EndScrollView(); GUI.enabled=true; return; }
-                    confirmDelete=mod.Id;
-                }
-            }
-            GUI.EndScrollView(); GUI.enabled=true;
-            Label(210,770,1020,40,notice,subtitle,Color.white);
-        }
-        void Slider(string name,ref float value,float min,float max)
-        {
-            GUILayout.BeginHorizontal(); GUILayout.Label(name,GUILayout.Width(370));
-            value=GUILayout.HorizontalSlider(value,min,max,GUILayout.Width(470));
-            GUILayout.Label(value.ToString("0.00"),GUILayout.Width(80)); GUILayout.EndHorizontal(); GUILayout.Space(9);
-        }
-        void FeelLab()
-        {
-            Label(200,62,1040,65,"FEEL LAB",title);
-            Label(200,130,1040,35,"LIVE SETTINGS  /  F1 TO RETURN TO YOUR SESSION",subtitle);
-            GUILayout.BeginArea(new Rect(220,190,1000,600));
-            settingsScroll=GUILayout.BeginScrollView(settingsScroll);
-            Settings.ReducedMotion=GUILayout.Toggle(Settings.ReducedMotion,"Reduced camera motion");
-            Slider("Stage brightness",ref Settings.StageBrightness,0,1.5f);
-            Slider("Hit sound volume",ref Settings.HitSoundVolume,0,1);
-            Slider("Bodycam lens",ref Settings.BodycamLens,0,.35f);
-            Slider("Mouse camera motion",ref Settings.MouseCameraMotion,0,2);
-            Slider("Saber flow assistance",ref Settings.SaberAssist,0,1);
-            Slider("Magic timing assistance",ref Settings.MagicTimingAssist,0,1);
-            Slider("Input latency compensation (ms)",ref latency,-200,200);
-            if(GUILayout.Button(calibrating?$"TAP SPACE TO THE CLICK  ({taps.Count}/12)  /  CANCEL":"CALIBRATE LATENCY  /  TAP TEST"))
-            { if(calibrating) { calibrating=false; metronome.Stop(); } else StartCalibration(); }
-            Slider("Magic position stiffness",ref Settings.MagicHandPositionStiffness,20,1400);
-            Slider("Magic position damping",ref Settings.MagicHandPositionDamping,.1f,2);
-            Slider("Magic rotation stiffness",ref Settings.MagicHandRotationStiffness,20,1400);
-            Slider("Magic rotation damping",ref Settings.MagicHandRotationDamping,.1f,2);
-            Slider("Magic arc intensity",ref Settings.MagicGestureArcIntensity,0,1);
-            Slider("Magic gesture distance",ref Settings.MagicGestureDistance,.1f,.7f);
-            Slider("Magic momentum impulse",ref Settings.MagicGestureOvershoot,0,2);
-            Slider("Magic finger curl",ref Settings.MagicFingerCurlIntensity,0,2);
-            Slider("Magic finger release speed",ref Settings.MagicFingerReleaseSpeed,3,35);
-            Slider("Magic trail intensity",ref Settings.MagicTrailIntensity,0,2);
-            Slider("Magic idle sway",ref Settings.MagicIdleSway,0,.06f);
-            Slider("Magic recovery",ref Settings.MagicRecoverySpeed,.2f,8);
-            Slider("Saber position stiffness",ref Settings.SaberPositionStiffness,20,1400);
-            Slider("Saber position damping",ref Settings.SaberPositionDamping,.1f,2);
-            Slider("Saber rotation stiffness",ref Settings.SaberRotationStiffness,20,1400);
-            Slider("Saber rotation damping",ref Settings.SaberRotationDamping,.1f,2);
-            Slider("Saber blade lag",ref Settings.SaberBladeLag,0,2);
-            Slider("Saber wrist influence",ref Settings.SaberWristInfluence,0,2);
-            Slider("Saber overshoot",ref Settings.SaberOvershoot,0,1);
-            Slider("Mouse sensitivity",ref Settings.SaberSwingSensitivity,.1f,3);
-            Slider("Saber trail intensity",ref Settings.SaberTrailIntensity,0,2);
-            Slider("Magic camera influence",ref Settings.MagicCameraInfluence,0,2);
-            Slider("Saber camera influence",ref Settings.SaberCameraInfluence,0,2);
-            Slider("Camera position stiffness",ref Settings.CameraPositionStiffness,20,1000);
-            Slider("Camera position damping",ref Settings.CameraPositionDamping,.1f,2);
-            Slider("Camera rotation stiffness",ref Settings.CameraRotationStiffness,20,1000);
-            Slider("Camera rotation damping",ref Settings.CameraRotationDamping,.1f,2);
-            Slider("Camera impact",ref Settings.CameraImpactIntensity,0,2);
-            Slider("Maximum camera roll",ref Settings.MaximumCameraRoll,0,3);
-            Slider("Camera breathing",ref Settings.IdleCameraInfluence,0,2);
-            Slider("Camera beat pulse",ref Settings.MusicCameraInfluence,0,2);
-            if(GUILayout.Button("SAVE GAME FEEL, ACCESSIBILITY & LATENCY"))
-            {
-                Settings.FeelVersion=GameFeelSettings.CurrentVersion;
-                File.WriteAllText(Path.Combine(Application.persistentDataPath,"ArcaneGameFeel.json"),JsonUtility.ToJson(Settings,true));
-                PlayerPrefs.SetFloat("Arcane.Latency",latency); PlayerPrefs.SetInt("Arcane.ReducedMotion",Settings.ReducedMotion?1:0); PlayerPrefs.Save();
-            }
-            GUILayout.EndScrollView(); GUILayout.EndArea();
+            Settings.FeelVersion=GameFeelSettings.CurrentVersion;
+            File.WriteAllText(Path.Combine(Application.persistentDataPath,"ArcaneGameFeel.json"),JsonUtility.ToJson(Settings,true));
+            PlayerPrefs.SetFloat("Arcane.Latency",latency); PlayerPrefs.SetInt("Arcane.ReducedMotion",Settings.ReducedMotion?1:0); PlayerPrefs.Save();
         }
     }
 }
